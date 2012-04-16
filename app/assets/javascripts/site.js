@@ -162,6 +162,9 @@ var Downloads = {
   userOS: '',
 
   init: function() {
+    var os = window.session.browser.os; // Mac, Windows, Linux
+    $('a#gui-os-filter').attr('data-os', os.toLowerCase());
+    $('a#gui-os-filter').html('Only show GUIs for my OS ('+ os +')');
     Downloads.observeGUIOSFilter();
   },
 
