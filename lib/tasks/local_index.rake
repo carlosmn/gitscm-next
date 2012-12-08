@@ -111,9 +111,10 @@ task :local_index => :environment do
     # get the list of authors by # of commits
     author_tag = tags.sort.last
     puts "Fetching author list for #{author_tag}"
-    authors = `git shortlog --no-merges -ns #{author_tag} |
-               perl -alne 'print if $F[0] > 1'`.split("\n").each do |line|
-      count, name = line.gsub(/\s+/, ' ').split(' ', 2)
+    `git shortlog --no-merges -ns #{author_tag}`.each_line do |line|
+      count, name = line.strip.split(' ', 2)
+      count = count.to_i
+      next unless count > 1
       author = Author.where(:name => name).first_or_create
       author.commit_count = count
       author.save
