@@ -1,5 +1,7 @@
 require 'octokit'
 require 'feedzirra'
+require 'nokogiri'
+require 'open-uri'
 
 def gcode_downloads(project)
   downloads = []
@@ -15,20 +17,35 @@ def file_url(project, filename)
   "https://#{project}.googlecode.com/files/#{filename}"
 end
 
+def bintray_file_url(package, repo, filename)
+  "https://dl.bintray.com/#{package}/#{repo}/#{filename}?direct"
+end
+
+def bintray_downloads(package, repo)
+  downloads = []
+  url = "https://dl.bintray.com/#{package}/#{repo}"
+  doc = Nokogiri::HTML(open(url))
+  doc.search('a').each do |link|
+    downloads << link.content
+  end
+
+  downloads
+end
+
 # find newest mac and windows binary downloads
 task :downloads => :environment do
   # find latest windows version
   project = "msysgit"
-  win_downloads = gcode_downloads(project)
-  win_downloads.each do |url, date|
-    name = url.split('/').last
+  repo = "git-for-windows"
+  package = "Git-for-Windows"
+  win_downloads = bintray_downloads("git-for-windows", "Git-for-Windows")
+  win_downloads.each do |name|
     if m = /^Git-(.*?)-(.*?)(\d{4})(\d{2})(\d{2})\.exe/.match(name)
-      url = file_url(project, name)
       version = m[1]
       puts version = version
       puts name
-      puts url
-      puts date
+      puts url = bintray_file_url(repo, package, name)
+      puts date = DateTime.new(Integer(m[3]), Integer(m[4]), Integer(m[5]))
       puts
       v = Version.where(:name => version).first
       if v

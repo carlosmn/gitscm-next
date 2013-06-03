@@ -25,7 +25,7 @@ gem "awesome_print"
 gem 'newrelic_rpm',    '~> 3.5.3.25'
 gem 'exceptional'
 gem 'tire'
-gem "feedzirra"
+gem "nokogiri"
 
 # Gems used only for assets and not required
 # in production environments by default.
